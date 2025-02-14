@@ -4,7 +4,8 @@
   "info": {
     "singularName": "message",
     "pluralName": "messages",
-    "displayName": "message"
+    "displayName": "message",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -14,19 +15,18 @@
       "type": "string",
       "required": true
     },
-    "sender": {
+    "message_from": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "message"
+    },
+    "message_type": {
       "type": "enumeration",
       "enum": [
         "user",
         "server"
-      ],
-      "required": true
-    },
-    "chat_session": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::chat-session.chat-session",
-      "inversedBy": "messages"
+      ]
     }
   }
 }

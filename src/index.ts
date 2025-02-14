@@ -1,10 +1,9 @@
-// src/index.ts (or .js if using JavaScript)
-// import { Strapi } from '@strapi/strapi';
 import { Server } from 'socket.io';
 
 interface MessageData {
   content: string;
-  room: string;
+  userId: string;
+  sessionId: string;
 }
 
 export default {
@@ -20,46 +19,58 @@ export default {
     io.on('connection', (socket) => {
       console.log('New chat connection established');
 
-      // Handle room joining
-      socket.on('joinRoom', async (roomId: string) => {
-        socket.join(`room_${roomId}`);
-        console.log(`User joined room ${roomId}`);
-        
-        // Send last 50 messages from the room
-        const messages = await strapi.entityService.findMany('api::message.message', {
-          filters: { room: roomId },
-          sort: 'createdAt:desc',
-          limit: 50,
-          populate: ['author']
-        });
-        
-        socket.emit('initialMessages', messages.reverse());
-      });
-
-      // Handle new messages
-      socket.on('createMessage', async (data: MessageData) => {
+      socket.on('startSession', async (data: MessageData) => {
         try {
-          // const { user } = socket.request;
-          
-          // if (!user) {
-          //   throw new Error('Not authenticated');
-          // }
+          const session = await strapi.entityService.create('api::session.session', {
+            data: {
+              sessionId: data.sessionId,
+              user: data.userId,
+            }
+          });
 
           const message = await strapi.entityService.create('api::message.message', {
             data: {
+              content: 'Hi!',
+              message_from: data.userId,
+              message_type: 'user',
+              sessionId:data.sessionId,
+            }
+          });
+          socket.emit('sessionStarted', { content: "Hi!", message_from:"Server", message_type: "server",sessionId: data.sessionId });
+        } catch (error) {
+          socket.emit('error', { message: 'Failed to start session', error: error.message });
+        }
+      });
+
+      socket.on('sendMessage', async (data: MessageData) => {
+        try {
+          // Create user message
+          const userMessage = await strapi.entityService.create('api::message.message', {
+            data: {
               content: data.content,
-              room: data.room,
-              // author: user.id
-            },
-            populate: ['author', 'room']
+              message_from: data.userId,
+              message_type: 'user',
+              session: data.sessionId,
+              publishedAt: new Date()
+            }
           });
 
-          io.to(`room_${data.room}`).emit('newMessage', message);
-        } catch (error) {
-          socket.emit('error', {
-            message: 'Failed to create message',
-            error: error.message
+          // Create server response message
+          const serverMessage = await strapi.entityService.create('api::message.message', {
+            data: {
+              content: data.content.toUpperCase(),
+              message_type: 'server',
+              session: data.sessionId,
+              publishedAt: new Date()
+            }
           });
+
+          socket.emit('messageResponse', {
+            userMessage,
+            serverMessage
+          });
+        } catch (error) {
+          socket.emit('error', { message: 'Failed to process message', error: error.message });
         }
       });
 
@@ -68,11 +79,8 @@ export default {
       });
     });
 
-    // Add socket.io instance to strapi context
     strapi.io = io;
   },
 
-  bootstrap({ strapi }: { strapi: any }) {
-    // Optional bootstrap logic
-  }
+  bootstrap({ strapi }: { strapi: any }) {}
 };
