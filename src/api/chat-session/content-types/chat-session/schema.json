@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "chat_sessions",
+  "info": {
+    "singularName": "chat-session",
+    "pluralName": "chat-sessions",
+    "displayName": "chat-session"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "chat_session"
+    },
+    "messages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::message.message",
+      "mappedBy": "chat_session"
+    }
+  }
+}

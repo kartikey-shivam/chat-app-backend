@@ -1,0 +1,269 @@
+{
+    "info": {
+      "name": "Chat Application API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Authentication",
+        "item": [
+          {
+            "name": "Register User",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/auth/local/register",
+                "host": ["{{base_url}}"],
+                "path": ["auth", "local", "register"]
+              }
+            },
+            "response": [
+              {
+                "name": "Successful Registration",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [],
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"Password123\"\n}"
+                  },
+                  "url": {
+                    "raw": "http://localhost:1337/auth/local/register",
+                    "host": ["localhost"],
+                    "port": "1337",
+                    "path": ["auth", "local", "register"]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "body": "{\n    \"jwt\": \"...\",\n    \"user\": {\n        \"id\": 1,\n        \"email\": \"user@example.com\"\n    }\n}"
+              }
+            ]
+          },
+          {
+            "name": "Login User",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"identifier\": \"user@example.com\",\n  \"password\": \"Password123\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/auth/local",
+                "host": ["{{base_url}}"],
+                "path": ["auth", "local"]
+              }
+            },
+            "response": [
+              {
+                "name": "Successful Login",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [],
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"identifier\": \"user@example.com\",\n    \"password\": \"Password123\"\n}"
+                  },
+                  "url": {
+                    "raw": "http://localhost:1337/auth/local",
+                    "host": ["localhost"],
+                    "port": "1337",
+                    "path": ["auth", "local"]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "body": "{\n    \"jwt\": \"...\",\n    \"user\": {\n        \"id\": 1,\n        \"email\": \"user@example.com\"\n    }\n}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Chat Sessions",
+        "item": [
+          {
+            "name": "Create Chat Session",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{jwt}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"title\": \"First Chat Session\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/chat-sessions",
+                "host": ["{{base_url}}"],
+                "path": ["chat-sessions"]
+              }
+            },
+            "response": [
+              {
+                "name": "Session Created",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer {{jwt}}"
+                    }
+                  ],
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"title\": \"First Chat Session\"\n}"
+                  },
+                  "url": {
+                    "raw": "http://localhost:1337/chat-sessions",
+                    "host": ["localhost"],
+                    "port": "1337",
+                    "path": ["chat-sessions"]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "body": "{\n    \"id\": 1,\n    \"title\": \"First Chat Session\",\n    \"user\": 1\n}"
+              }
+            ]
+          },
+          {
+            "name": "List Chat Sessions",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{jwt}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/chat-sessions",
+                "host": ["{{base_url}}"],
+                "path": ["chat-sessions"]
+              }
+            },
+            "response": [
+              {
+                "name": "Sessions Retrieved",
+                "originalRequest": {
+                  "method": "GET",
+                  "header": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer {{jwt}}"
+                    }
+                  ],
+                  "url": {
+                    "raw": "http://localhost:1337/chat-sessions",
+                    "host": ["localhost"],
+                    "port": "1337",
+                    "path": ["chat-sessions"]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "body": "[{\n    \"id\": 1,\n    \"title\": \"First Chat Session\",\n    \"user\": 1\n}]"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Messages",
+        "item": [
+          {
+            "name": "Get Session Messages",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{jwt}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/messages?session=1",
+                "host": ["{{base_url}}"],
+                "path": ["messages"],
+                "query": [
+                  {
+                    "key": "session",
+                    "value": "1"
+                  }
+                ]
+              }
+            },
+            "response": [
+              {
+                "name": "Messages Retrieved",
+                "originalRequest": {
+                  "method": "GET",
+                  "header": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer {{jwt}}"
+                    }
+                  ],
+                  "url": {
+                    "raw": "http://localhost:1337/messages?session=1",
+                    "host": ["localhost"],
+                    "port": "1337",
+                    "path": ["messages"],
+                    "query": [
+                      {
+                        "key": "session",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "body": "[{\n    \"id\": 1,\n    \"content\": \"Hello\",\n    \"sender\": \"user\",\n    \"session\": 1\n}]"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:1337"
+      },
+      {
+        "key": "jwt",
+        "value": ""
+      }
+    ]
+  }

@@ -1,20 +1,78 @@
-// import type { Core } from '@strapi/strapi';
+// src/index.ts (or .js if using JavaScript)
+// import { Strapi } from '@strapi/strapi';
+import { Server } from 'socket.io';
+
+interface MessageData {
+  content: string;
+  room: string;
+}
 
 export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register({ strapi }: { strapi: any }) {
+    const io = new Server(strapi.server.httpServer, {
+      cors: {
+        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        methods: ['GET', 'POST']
+      },
+      path: '/socket.io/chat'
+    });
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+    io.on('connection', (socket) => {
+      console.log('New chat connection established');
+
+      // Handle room joining
+      socket.on('joinRoom', async (roomId: string) => {
+        socket.join(`room_${roomId}`);
+        console.log(`User joined room ${roomId}`);
+        
+        // Send last 50 messages from the room
+        const messages = await strapi.entityService.findMany('api::message.message', {
+          filters: { room: roomId },
+          sort: 'createdAt:desc',
+          limit: 50,
+          populate: ['author']
+        });
+        
+        socket.emit('initialMessages', messages.reverse());
+      });
+
+      // Handle new messages
+      socket.on('createMessage', async (data: MessageData) => {
+        try {
+          // const { user } = socket.request;
+          
+          // if (!user) {
+          //   throw new Error('Not authenticated');
+          // }
+
+          const message = await strapi.entityService.create('api::message.message', {
+            data: {
+              content: data.content,
+              room: data.room,
+              // author: user.id
+            },
+            populate: ['author', 'room']
+          });
+
+          io.to(`room_${data.room}`).emit('newMessage', message);
+        } catch (error) {
+          socket.emit('error', {
+            message: 'Failed to create message',
+            error: error.message
+          });
+        }
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Client disconnected');
+      });
+    });
+
+    // Add socket.io instance to strapi context
+    strapi.io = io;
+  },
+
+  bootstrap({ strapi }: { strapi: any }) {
+    // Optional bootstrap logic
+  }
 };
