@@ -4,7 +4,7 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
-    "build": "cross-env NODE_ENV=production strapi build && xcopy /E /I src\\extensions dist\\extensions",
+    "build": "strapi build",
     "deploy": "strapi deploy",
     "develop": "strapi develop",
     "start": "strapi start",
