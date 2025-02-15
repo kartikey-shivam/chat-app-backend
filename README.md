@@ -1,7 +1,7 @@
 ## Chat Application Backend
 A real-time chat application backend built with Strapi and Socket.IO, enabling seamless user-server communication.
 
-🌐 Live Demo: [Live Demo](https://chat-app-frontend-nine.vercel.app/)
+🌐 Live Demo: [Live Demo](https://chat-app-frontend-seven-theta.vercel.app/login)
 
 ## 🔗 Links
 Frontend Repository: [Chat App Frontend](https://github.com/kartikey-shivam/chat-app-frontend)
